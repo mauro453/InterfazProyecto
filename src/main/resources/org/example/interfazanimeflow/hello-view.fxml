@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23"
+      fx:controller="org.example.interfazanimeflow.HelloController"
+      style="-fx-background-color: #ffffff;">
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+    </padding>
+
+    <Label text="AnimeFlow Login">
+        <font>
+            <Font name="System Bold" size="24.0" />
+        </font>
+    </Label>
+
+    <VBox spacing="10.0">
+        <TextField fx:id="txtUser" promptText="Usuario" prefHeight="40.0" />
+        <PasswordField fx:id="txtPass" promptText="Contraseña" prefHeight="40.0" />
+    </VBox>
+
+    <Button onAction="#onLoginClick" prefHeight="40.0" prefWidth="200.0"
+            style="-fx-background-color: #0078d4; -fx-text-fill: white;" text="Iniciar Sesión">
+        <font>
+            <Font name="System Bold" size="14.0" />
+        </font>
+    </Button>
+
+    <Label fx:id="lblStatus" text="Esperando credenciales..." textFill="#666666" />
+</VBox>
