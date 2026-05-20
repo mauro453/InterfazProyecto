@@ -3,14 +3,15 @@ package org.example.interfazanimeflow;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.ByteArrayInputStream;
@@ -23,87 +24,28 @@ import java.util.Base64;
 
 public class DashboardController {
 
-    @FXML private TableView<Anime> tablaAnimes;
-    @FXML private TableColumn<Anime, String> colTitulo;
-    @FXML private TableColumn<Anime, Integer> colPuntuacion;
-    @FXML private TableColumn<Anime, String> colDescripcion;
-    @FXML private TableColumn<Anime, String> colFoto; // Tu columna de portada en el FXML
+    // Cambiamos la tabla por nuestro nuevo contenedor de tarjetas
+    @FXML private FlowPane containerAnimes;
     @FXML private Button btnCerrarSesion;
 
-    // Variable para saber qué usuario está conectado
     private Long usuarioId;
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
 
-    // 1. ESTE MÉTODO RECIBE EL ID DESDE EL LOGIN Y ARRANCA LA CARGA
     public void setUsuarioId(Long usuarioId) {
         this.usuarioId = usuarioId;
-        cargarAnimesDesdeServidor(); // Se ejecuta SOLO cuando ya sabemos el ID
+        cargarAnimesDesdeServidor();
     }
 
     @FXML
     public void initialize() {
-        // Configurar columnas de texto
-        colTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
-        colPuntuacion.setCellValueFactory(new PropertyValueFactory<>("puntuacion"));
-        colDescripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
-
-        // Configurar columna de la imagen (apuntando a 'portada')
-        colFoto.setCellValueFactory(new PropertyValueFactory<>("portada"));
-        colFoto.setCellFactory(new Callback<TableColumn<Anime, String>, TableCell<Anime, String>>() {
-            @Override
-            public TableCell<Anime, String> call(TableColumn<Anime, String> param) {
-                return new TableCell<Anime, String>() {
-                    private final ImageView imageView = new ImageView();
-                    {
-                        imageView.setFitWidth(60);
-                        imageView.setFitHeight(80);
-                        imageView.setPreserveRatio(true);
-                    }
-
-                    @Override
-                    protected void updateItem(String base64Portada, boolean empty) {
-                        super.updateItem(base64Portada, empty);
-                        if (empty || base64Portada == null || base64Portada.trim().isEmpty()) {
-                            setGraphic(null);
-                        } else {
-                            try {
-                                String cleanBase64 = base64Portada.trim().replaceAll("\\s+", "");
-                                byte[] imageBytes = Base64.getDecoder().decode(cleanBase64);
-                                ByteArrayInputStream bis = new ByteArrayInputStream(imageBytes);
-                                Image image = new Image(bis);
-                                imageView.setImage(image);
-                                setGraphic(imageView);
-                            } catch (Exception e) {
-                                setGraphic(null);
-                            }
-                        }
-                    }
-                };
-            }
-        });
-
-        // Forzar tamaño alto de las filas para las fotos
-        tablaAnimes.setRowFactory(tv -> {
-            TableRow<Anime> row = new TableRow<>();
-            row.prefHeightProperty().setValue(90);
-            row.setMinHeight(90);
-            return row;
-        });
-
-        // NOTA: Ya no llamamos a cargarAnimesDesdeServidor() aquí adentro.
+        // Ya no necesitamos inicializar columnas estáticas de tabla. ¡Más limpio!
     }
 
-    // 2. MÉTODO QUE FILTRA LOS ANIMES POR EL ID DEL USUARIO
     private void cargarAnimesDesdeServidor() {
-        // Modificamos la URL para enviarle el ID del usuario al Backend
-        // Cambia esto en tu JavaFX:
         String url = "http://localhost:8080/api/animes/usuario/" + this.usuarioId;
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .GET()
-                .build();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
 
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
@@ -111,8 +53,12 @@ public class DashboardController {
                         try {
                             Anime[] animesArray = mapper.readValue(response.body(), Anime[].class);
                             Platform.runLater(() -> {
-                                tablaAnimes.getItems().clear();
-                                tablaAnimes.getItems().addAll(animesArray);
+                                containerAnimes.getChildren().clear(); // Limpiamos catálogo
+                                for (Anime anime : animesArray) {
+                                    // Creamos una tarjeta visual por cada anime recibido
+                                    VBox card = crearTarjetaAnime(anime);
+                                    containerAnimes.getChildren().add(card);
+                                }
                             });
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -121,14 +67,70 @@ public class DashboardController {
                 });
     }
 
-    // 3. MÉTODO PARA VOLVER AL LOGIN (CERRAR SESIÓN)
+    // EL TRUCO DE MAGIA: Construye el diseño visual tipo MyAnimeList para cada anime
+    private VBox crearTarjetaAnime(Anime anime) {
+        VBox card = new VBox();
+        card.setPrefSize(180, 290);
+        // Estilo moderno: Fondo oscuro suave, bordes redondeados y efecto hover de escala
+        card.setStyle("-fx-background-color: #374151; -fx-background-radius: 12; "
+                + "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 8, 0, 0, 4);");
+        card.setAlignment(Pos.TOP_CENTER);
+        card.setSpacing(8);
+
+        // 1. Contenedor de la Imagen (Esquinas superiores redondeadas)
+        ImageView imageView = new ImageView();
+        imageView.setFitWidth(180);
+        imageView.setFitHeight(210);
+        imageView.setPreserveRatio(false); // Forzamos escala de cartelera exacta
+
+        if (anime.getPortada() != null && !anime.getPortada().trim().isEmpty()) {
+            try {
+                String cleanBase64 = anime.getPortada().trim().replaceAll("\\s+", "");
+                byte[] imageBytes = Base64.getDecoder().decode(cleanBase64);
+                imageView.setImage(new Image(new ByteArrayInputStream(imageBytes)));
+            } catch (Exception e) {
+                // Imagen por defecto si falla el Base64
+            }
+        }
+
+        // Clip para recortar la imagen con los bordes redondeados de la tarjeta arriba
+        javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle(180, 210);
+        clip.setArcWidth(24);
+        clip.setArcHeight(24);
+        imageView.setClip(clip);
+
+        // 2. Título del Anime
+        Label lblTitulo = new Label(anime.getTitulo());
+        lblTitulo.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14;");
+        lblTitulo.setWrapText(false); // Evita romper diseño
+        lblTitulo.setMaxWidth(160);
+        VBox.setMargin(lblTitulo, new Insets(0, 8, 0, 8));
+
+        // 3. Puntuación (Estilo MyAnimeList ⭐ 8.5)
+        Label lblPuntuacion = new Label("⭐ " + (anime.getPuntuacion() != null ? anime.getPuntuacion() : "N/A"));
+        lblPuntuacion.setStyle("-fx-text-fill: #F59E0B; -fx-font-weight: bold; -fx-font-size: 13;");
+
+        // Tooltip opcional para ver la descripción al pasar el ratón por encima
+        if (anime.getDescripcion() != null) {
+            Tooltip tooltip = new Tooltip(anime.getDescripcion());
+            tooltip.setStyle("-fx-font-size: 12;");
+            Tooltip.install(card, tooltip);
+        }
+
+        // Efecto visual interactivo al pasar el ratón por encima (Hover)
+        card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: #4B5563; -fx-background-radius: 12; -fx-scale-x: 1.03; -fx-scale-y: 1.03; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 12, 0, 0, 6);"));
+        card.setOnMouseExited(e -> card.setStyle("-fx-background-color: #374151; -fx-background-radius: 12; -fx-scale-x: 1.0; -fx-scale-y: 1.0; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 8, 0, 0, 4);"));
+
+        card.getChildren().addAll(imageView, lblTitulo, lblPuntuacion);
+        return card;
+    }
+
     @FXML
     protected void onCerrarSesionClick() {
         Platform.runLater(() -> {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
                 Parent root = loader.load();
-
                 Stage stage = (Stage) btnCerrarSesion.getScene().getWindow();
                 stage.setScene(new Scene(root));
                 stage.setTitle("AnimeFlow - Login");

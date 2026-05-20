@@ -1,25 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.image.ImageView?>
 
-<VBox spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.example.interfazanimeflow.DashboardController" style="-fx-padding: 20;">
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-    <Label text="Mis Animes Guardados" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #1F2937;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.interfazanimeflow.DashboardController">
 
-    <TableView fx:id="tablaAnimes" prefHeight="400.0" prefWidth="600.0">
-        <columns>
-            <!-- Columna para la Imagen -->
-            <TableColumn fx:id="colFoto" prefWidth="100.0" text="Portada" />
-            <!-- Columna para el Título -->
-            <TableColumn fx:id="colTitulo" prefWidth="150.0" text="Título" />
-            <!-- Columna para la Puntuación -->
-            <TableColumn fx:id="colPuntuacion" prefWidth="80.0" text="Nota" />
-            <!-- Columna para la Descripción -->
-            <TableColumn fx:id="colDescripcion" prefWidth="250.0" text="Descripción" />
-        </columns>
-    </TableView>
+    <top>
+        <HBox alignment="CENTER_LEFT" prefHeight="70.0" prefWidth="200.0" style="-fx-background-color: #111827; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 4);" BorderPane.alignment="CENTER">
+            <children>
+                <Label text="Anime" textFill="#3B82F6">
+                    <font>
+                        <Font name="System Bold" size="26.0" />
+                    </font>
+                </Label>
+                <Label text="Flow" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="26.0" />
+                    </font>
+                    <HBox.margin>
+                        <Insets right="30.0" />
+                    </HBox.margin>
+                </Label>
+                <Label text="Mi Lista de Animes" textFill="#9CA3AF">
+                    <font>
+                        <Font size="16.0" />
+                    </font>
+                </Label>
+                <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Button fx:id="btnCerrarSesion" mnemonicParsing="false" onAction="#onCerrarSesionClick" style="-fx-background-color: #EF4444; -fx-background-radius: 8; -fx-text-fill: white; -fx-cursor: hand;" text="Cerrar Sesión">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                            <padding>
+                                <Insets bottom="8.0" left="16.0" right="16.0" top="8.0" />
+                            </padding>
+                        </Button>
+                    </children>
+                </HBox>
+            </children>
+            <padding>
+                <Insets left="30.0" right="30.0" />
+            </padding>
+        </HBox>
+    </top>
 
-    <Button fx:id="btnCerrarSesion" onAction="#onCerrarSesionClick" text="Cerrar Sesión" style="-fx-background-color: #e81123; -fx-text-fill: white;" />
-</VBox>
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="AS_NEEDED" BorderPane.alignment="CENTER">
+            <content>
+                <FlowPane fx:id="containerAnimes" hgap="25.0" vgap="25.0" style="-fx-background-color: #1F2937;">
+                    <padding>
+                        <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
+                    </padding>
+                </FlowPane>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>
