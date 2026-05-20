@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+
+<VBox spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.interfazanimeflow.DashboardController" style="-fx-padding: 20;">
+
+    <Label text="Mis Animes Guardados" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+
+    <TableView fx:id="tablaAnimes" prefHeight="400.0" prefWidth="600.0">
+        <columns>
+            <!-- Columna para la Imagen -->
+            <TableColumn fx:id="colFoto" prefWidth="100.0" text="Portada" />
+            <!-- Columna para el Título -->
+            <TableColumn fx:id="colTitulo" prefWidth="150.0" text="Título" />
+            <!-- Columna para la Puntuación -->
+            <TableColumn fx:id="colPuntuacion" prefWidth="80.0" text="Nota" />
+            <!-- Columna para la Descripción -->
+            <TableColumn fx:id="colDescripcion" prefWidth="250.0" text="Descripción" />
+        </columns>
+    </TableView>
+
+    <Button text="Cerrar Sesión" onAction="#onLogoutClick" style="-fx-background-color: #f44336; -fx-text-fill: white;" />
+</VBox>

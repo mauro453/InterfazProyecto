@@ -6,6 +6,7 @@ module org.example.interfazanimeflow {
     // Si usas ControlsFX o ValidatorFX que pusiste en el POM:
     requires org.controlsfx.controls;
     requires net.synedra.validatorfx;
+    requires com.fasterxml.jackson.databind;
 
     opens org.example.interfazanimeflow to javafx.fxml;
     exports org.example.interfazanimeflow;
