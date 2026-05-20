@@ -8,6 +8,7 @@ public class Anime {
     private String titulo;
     private String descripcion;
     private Integer puntuacion;
+    private String portada;
 
     public Anime() {}
 
@@ -23,4 +24,12 @@ public class Anime {
 
     public Integer getPuntuacion() { return puntuacion; }
     public void setPuntuacion(Integer puntuacion) { this.puntuacion = puntuacion; }
+
+    public String getPortada() {
+        return portada;
+    }
+
+    public void setPortada(String portada) {
+        this.portada = portada;
+    }
 }

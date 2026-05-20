@@ -10,21 +10,25 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.*;
 import javafx.application.Platform;
+import org.example.interfazanimeflow.Usuario;
+import com.fasterxml.jackson.databind.ObjectMapper; // <-- IMPORTANTE: Faltaba esta importación
 
 public class HelloController {
+
     @FXML private TextField txtUser;
     @FXML private PasswordField txtPass;
     @FXML private Label lblStatus;
-    @FXML
-    private Button btnLogin; // Asegúrate de importar javafx.scene.control.Button
+    @FXML private Button btnLogin;
 
     private final HttpClient client = HttpClient.newHttpClient();
+    private final ObjectMapper mapper = new ObjectMapper(); // <-- SOLUCIÓN: Instanciamos el mapper aquí
 
     @FXML
     protected void onLoginClick() {
         String user = txtUser.getText();
         String pass = txtPass.getText();
 
+        // Creamos el JSON para la autenticación
         String json = String.format("{\"username\":\"%s\", \"password\":\"%s\"}", user, pass);
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -35,50 +39,46 @@ public class HelloController {
 
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
+
                     if (response.statusCode() == 200) {
                         Platform.runLater(() -> {
-                            lblStatus.setText("¡Bienvenido!");
-                            lblStatus.setStyle("-fx-text-fill: green;");
+                            try {
+                                // 1. Mapeamos el JSON al objeto Usuario usando el mapper que acabamos de definir arriba
+                                Usuario usuarioLogueado = mapper.readValue(response.body(), Usuario.class);
 
-                            // LLAMADA AL CAMBIO DE PANTALLA
-                            cambiarAPantallaDashboard();
+                                // 2. Extraemos el ID del usuario conectado
+                                Long idUsuario = usuarioLogueado.getId();
+
+                                // 3. Cargamos el archivo FXML del Dashboard
+                                FXMLLoader loader = new FXMLLoader(getClass().getResource("dashboard.fxml"));
+                                Parent root = loader.load();
+
+                                // 4. Obtenemos el controlador del Dashboard y le inyectamos el ID para filtrar sus animes
+                                DashboardController dashboardController = loader.getController();
+                                dashboardController.setUsuarioId(idUsuario);
+
+                                // 5. Cambiamos la escena de la ventana actual para mostrar el panel
+                                Stage stage = (Stage) btnLogin.getScene().getWindow();
+                                stage.setScene(new Scene(root));
+                                stage.setTitle("AnimeFlow - Panel Principal");
+                                stage.show();
+
+                            } catch (IOException e) {
+                                lblStatus.setText("Error al cargar la pantalla");
+                                System.out.println("Error de lectura JSON o FXML: " + e.getMessage());
+                                e.printStackTrace();
+                            } catch (Exception e) {
+                                lblStatus.setText("Error inesperado");
+                                e.printStackTrace();
+                            }
                         });
                     } else {
+                        // Si las credenciales fallan, avisamos al usuario en la interfaz
                         Platform.runLater(() -> {
-                            lblStatus.setText("Error: Credenciales inválidas");
-                            lblStatus.setStyle("-fx-text-fill: red;");
+                            lblStatus.setText("Usuario o contraseña incorrectos");
+                            System.out.println("Credenciales incorrectas. Código: " + response.statusCode());
                         });
                     }
-                })
-                .exceptionally(ex -> {
-                    Platform.runLater(() -> lblStatus.setText("Error de conexión con el servidor"));
-                    return null;
                 });
-    }
-
-    // HelloController.java
-
-    private void cambiarAPantallaDashboard() {
-        // Usamos Platform.runLater por si vienes de una respuesta asíncrona del servidor
-        Platform.runLater(() -> {
-            try {
-                // 1. Cargar el nuevo archivo FXML
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("dashboard.fxml"));
-                Parent root = loader.load();
-
-                // 2. Obtener la ventana actual a través del botón
-                Stage stage = (Stage) btnLogin.getScene().getWindow();
-
-                // 3. Crear la nueva escena y aplicarla
-                Scene scene = new Scene(root);
-                stage.setScene(scene);
-                stage.setTitle("AnimeFlow - Dashboard");
-                stage.show();
-
-            } catch (IOException e) {
-                lblStatus.setText("Error al cargar la pantalla");
-                e.printStackTrace();
-            }
-        });
     }
 }

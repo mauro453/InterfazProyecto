@@ -21,5 +21,5 @@
         </columns>
     </TableView>
 
-    <Button text="Cerrar Sesión" onAction="#onLogoutClick" style="-fx-background-color: #f44336; -fx-text-fill: white;" />
+    <Button fx:id="btnCerrarSesion" onAction="#onCerrarSesionClick" text="Cerrar Sesión" style="-fx-background-color: #e81123; -fx-text-fill: white;" />
 </VBox>
