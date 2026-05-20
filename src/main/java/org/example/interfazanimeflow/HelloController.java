@@ -59,8 +59,9 @@ public class HelloController {
 
                                 // 5. Cambiamos la escena de la ventana actual para mostrar el panel
                                 Stage stage = (Stage) btnLogin.getScene().getWindow();
-                                stage.setScene(new Scene(root));
+                                stage.setScene(new Scene(root, 1050, 720));
                                 stage.setTitle("AnimeFlow - Panel Principal");
+                                stage.centerOnScreen();
                                 stage.show();
 
                             } catch (IOException e) {
@@ -80,5 +81,11 @@ public class HelloController {
                         });
                     }
                 });
+    }
+    @FXML
+    public void initialize() {
+        // Animación hover para el botón de login
+        btnLogin.setOnMouseEntered(e -> btnLogin.setStyle("-fx-background-color: #2563EB; -fx-background-radius: 8; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold; -fx-font-size: 15;"));
+        btnLogin.setOnMouseExited(e -> btnLogin.setStyle("-fx-background-color: #3B82F6; -fx-background-radius: 8; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold; -fx-font-size: 15;"));
     }
 }

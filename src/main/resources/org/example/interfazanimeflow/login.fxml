@@ -5,33 +5,86 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21"
-      fx:controller="org.example.interfazanimeflow.HelloController"
-      style="-fx-background-color: #ffffff;">
-    <padding>
-        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
-    </padding>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="400.0" style="-fx-background-color: linear-gradient(to bottom, #111827, #1F2937);" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.interfazanimeflow.HelloController">
+    <children>
+        <VBox alignment="CENTER" layoutX="40.0" layoutY="30.0" prefWidth="320.0" spacing="25.0">
+            <children>
 
-    <Label text="AnimeFlow Login">
-        <font>
-            <Font name="System Bold" size="24.0" />
-        </font>
-    </Label>
+                <VBox alignment="CENTER" spacing="5.0">
+                    <children>
+                        <HBox alignment="CENTER">
+                            <children>
+                                <Label text="Anime" textFill="#3B82F6">
+                                    <font>
+                                        <Font name="System Bold" size="36.0" />
+                                    </font>
+                                </Label>
+                                <Label text="Flow" textFill="WHITE">
+                                    <font>
+                                        <Font name="System Bold" size="36.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </HBox>
+                        <Label text="Tu catálogo personal de anime" textFill="#9CA3AF">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                    </children>
+                    <VBox.margin>
+                        <Insets bottom="15.0" top="20.0" />
+                    </VBox.margin>
+                </VBox>
 
-    <VBox spacing="10.0">
-        <TextField fx:id="txtUser" promptText="Usuario" prefHeight="40.0" />
-        <PasswordField fx:id="txtPass" promptText="Contraseña" prefHeight="40.0" />
-    </VBox>
+                <VBox spacing="8.0">
+                    <children>
+                        <Label text="Nombre de usuario" textFill="#E5E7EB">
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtUser" promptText="Introduce tu usuario..." style="-fx-background-color: #374151; -fx-text-fill: white; -fx-prompt-text-fill: #9CA3AF; -fx-background-radius: 8; -fx-border-color: #4B5563; -fx-border-radius: 8; -fx-padding: 10;">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </TextField>
+                    </children>
+                </VBox>
 
-    <Button fx:id="btnLogin" onAction="#onLoginClick" prefHeight="40.0" prefWidth="200.0"
-            style="-fx-background-color: #0078d4; -fx-text-fill: white;" text="Iniciar Sesión">
-        <font>
-            <Font name="System Bold" size="14.0" />
-        </font>
-    </Button>
+                <VBox spacing="8.0">
+                    <children>
+                        <Label text="Contraseña" textFill="#E5E7EB">
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
+                        </Label>
+                        <PasswordField fx:id="txtPass" promptText="••••••••" style="-fx-background-color: #374151; -fx-text-fill: white; -fx-prompt-text-fill: #9CA3AF; -fx-background-radius: 8; -fx-border-color: #4B5563; -fx-border-radius: 8; -fx-padding: 10;">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </PasswordField>
+                    </children>
+                </VBox>
 
-    <Label fx:id="lblStatus" text="Esperando credenciales..." textFill="#666666" />
-</VBox>
+                <Label fx:id="lblStatus" alignment="CENTER" prefHeight="20.0" prefWidth="300.0" textFill="#EF4444">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Label>
+
+                <Button fx:id="btnLogin" mnemonicParsing="false" onAction="#onLoginClick" prefHeight="45.0" prefWidth="320.0" style="-fx-background-color: #3B82F6; -fx-background-radius: 8; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold; -fx-font-size: 15;" text="Iniciar Sesión" textAlignment="CENTER">
+                    <VBox.margin>
+                        <Insets top="10.0" />
+                    </VBox.margin>
+                </Button>
+
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>
