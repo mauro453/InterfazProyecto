@@ -45,8 +45,17 @@
                     </children>
                 </HBox>
 
-                <HBox alignment="CENTER_RIGHT">
+                <HBox alignment="CENTER_RIGHT" spacing="12.0">
                     <children>
+                        <Button fx:id="btnAñadirAnime" mnemonicParsing="false" onAction="#onAñadirAnimeClick" style="-fx-background-color: #10B981; -fx-background-radius: 8; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold;" text="+ Añadir Anime">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                            <padding>
+                                <Insets bottom="8.0" left="16.0" right="16.0" top="8.0" />
+                            </padding>
+                        </Button>
+
                         <Button fx:id="btnCerrarSesion" mnemonicParsing="false" onAction="#onCerrarSesionClick" style="-fx-background-color: #EF4444; -fx-background-radius: 8; -fx-text-fill: white; -fx-cursor: hand;" text="Cerrar Sesión">
                             <font>
                                 <Font name="System Bold" size="14.0" />

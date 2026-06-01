@@ -26,10 +26,11 @@ public class DashboardController {
 
     @FXML private FlowPane containerAnimes;
     @FXML private Button btnCerrarSesion;
-    @FXML private TextField txtBuscar; // <-- NUEVO: Vinculado con el fxml
+    @FXML private TextField txtBuscar;
+    @FXML private Button btnAñadirAnime; // <-- NUEVO: Vinculado con el nuevo botón del FXML
 
     private Long usuarioId;
-    private Anime[] listaAnimesCompleta; // <-- NUEVO: Para guardar los animes en memoria
+    private Anime[] listaAnimesCompleta;
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -40,7 +41,6 @@ public class DashboardController {
 
     @FXML
     public void initialize() {
-        // <-- NUEVO: Escuchamos en tiempo real lo que el usuario escribe en la barra
         txtBuscar.textProperty().addListener((observable, oldValue, newValue) -> {
             filtrarYMostrarAnimes(newValue);
         });
@@ -55,11 +55,9 @@ public class DashboardController {
                 .thenAccept(response -> {
                     if (response.statusCode() == 200) {
                         try {
-                            // MODIFICADO: Guardamos el array original en nuestra variable global
                             listaAnimesCompleta = mapper.readValue(response.body(), Anime[].class);
 
                             Platform.runLater(() -> {
-                                // Mostramos todos al cargar la pantalla inicialmente
                                 filtrarYMostrarAnimes("");
                             });
                         } catch (Exception e) {
@@ -69,16 +67,14 @@ public class DashboardController {
                 });
     }
 
-    // <-- NUEVO MÉTODO: Limpia el FlowPane y solo añade las tarjetas que coincidan con la búsqueda
     private void filtrarYMostrarAnimes(String textoBusqueda) {
         if (listaAnimesCompleta == null) return;
 
-        containerAnimes.getChildren().clear(); // Limpiamos catálogo visual
+        containerAnimes.getChildren().clear();
 
         String filtro = textoBusqueda.toLowerCase().trim();
 
         for (Anime anime : listaAnimesCompleta) {
-            // Si el buscador está vacío o el título contiene el filtro, renderizamos la tarjeta
             if (filtro.isEmpty() || anime.getTitulo().toLowerCase().contains(filtro)) {
                 VBox card = crearTarjetaAnime(anime);
                 containerAnimes.getChildren().add(card);
@@ -86,7 +82,6 @@ public class DashboardController {
         }
     }
 
-    // EL TRUCO DE MAGIA: Construye el diseño visual tipo MyAnimeList para cada anime
     private VBox crearTarjetaAnime(Anime anime) {
         VBox card = new VBox();
         card.setPrefSize(180, 290);
@@ -151,5 +146,32 @@ public class DashboardController {
                 System.out.println("Error al cerrar sesión: " + e.getMessage());
             }
         });
+    }
+
+    // <-- NUEVO MÉTODO: Controla la apertura de la ventana flotante modal para registrar animes
+    @FXML
+    protected void onAñadirAnimeClick() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("nuevo-anime.fxml"));
+            Parent root = loader.load();
+
+            // Configuramos la ventana flotante (Stage)
+            Stage stage = new Stage();
+            stage.setTitle("AnimeFlow - Añadir Anime");
+            stage.setScene(new Scene(root));
+            stage.setResizable(false);
+
+            // Hace que la ventana sea modal (bloquea la de atrás hasta que se cierre)
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+
+            // Pasamos los datos del ID y la referencia de este controlador para refrescar la lista al guardar
+            NuevoAnimeController nuevoAnimeController = loader.getController();
+            nuevoAnimeController.setData(this.usuarioId, this);
+
+            stage.show();
+        } catch (IOException e) {
+            System.out.println("Error al abrir la ventana de añadir anime: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
