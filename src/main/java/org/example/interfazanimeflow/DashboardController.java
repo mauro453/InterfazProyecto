@@ -27,7 +27,7 @@ public class DashboardController {
     @FXML private FlowPane containerAnimes;
     @FXML private Button btnCerrarSesion;
     @FXML private TextField txtBuscar;
-    @FXML private Button btnAñadirAnime; // <-- NUEVO: Vinculado con el nuevo botón del FXML
+    @FXML private Button btnAñadirAnime;
 
     private Long usuarioId;
     private Anime[] listaAnimesCompleta;
@@ -125,8 +125,32 @@ public class DashboardController {
             Tooltip.install(card, tooltip);
         }
 
+        // Efectos Visuales (Hover)
         card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: #4B5563; -fx-background-radius: 12; -fx-scale-x: 1.03; -fx-scale-y: 1.03; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 12, 0, 0, 6);"));
         card.setOnMouseExited(e -> card.setStyle("-fx-background-color: #374151; -fx-background-radius: 12; -fx-scale-x: 1.0; -fx-scale-y: 1.0; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 8, 0, 0, 4);"));
+
+        // ¡NUEVO!: Al hacer clic en la tarjeta, abrimos la ventana de información detallada
+        card.setOnMouseClicked(e -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("detalle-anime.fxml"));
+                Parent root = loader.load();
+
+                Stage stage = new Stage();
+                stage.setTitle("AnimeFlow - Información de " + anime.getTitulo());
+                stage.setScene(new Scene(root));
+                stage.setResizable(false);
+                stage.initModality(javafx.stage.Modality.APPLICATION_MODAL); // Bloquea la ventana principal temporalmente
+
+                // Pasamos el objeto anime completo al controlador de la ventana de detalles
+                DetalleAnimeController detalleController = loader.getController();
+                detalleController.setAnime(anime);
+
+                stage.show();
+            } catch (IOException ex) {
+                System.out.println("Error al abrir los detalles del anime: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        });
 
         card.getChildren().addAll(imageView, lblTitulo, lblPuntuacion);
         return card;
@@ -148,23 +172,18 @@ public class DashboardController {
         });
     }
 
-    // <-- NUEVO MÉTODO: Controla la apertura de la ventana flotante modal para registrar animes
     @FXML
     protected void onAñadirAnimeClick() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("nuevo-anime.fxml"));
             Parent root = loader.load();
 
-            // Configuramos la ventana flotante (Stage)
             Stage stage = new Stage();
             stage.setTitle("AnimeFlow - Añadir Anime");
             stage.setScene(new Scene(root));
             stage.setResizable(false);
-
-            // Hace que la ventana sea modal (bloquea la de atrás hasta que se cierre)
             stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
 
-            // Pasamos los datos del ID y la referencia de este controlador para refrescar la lista al guardar
             NuevoAnimeController nuevoAnimeController = loader.getController();
             nuevoAnimeController.setData(this.usuarioId, this);
 
