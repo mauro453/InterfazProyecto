@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="550.0" prefWidth="400.0" style="-fx-background-color: linear-gradient(to bottom, #111827, #1F2937);" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.interfazanimeflow.InicioController">
+    <children>
+        <VBox alignment="CENTER" layoutX="40.0" layoutY="50.0" prefHeight="450.0" prefWidth="320.0" spacing="40.0">
+            <children>
+                <VBox alignment="CENTER" spacing="5.0">
+                    <children>
+                        <HBox alignment="CENTER">
+                            <children>
+                                <Label text="Anime" textFill="#3B82F6">
+                                    <font>
+                                        <Font name="System Bold" size="42.0" />
+                                    </font>
+                                </Label>
+                                <Label text="Flow" textFill="WHITE">
+                                    <font>
+                                        <Font name="System Bold" size="42.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </HBox>
+                        <Label text="Tu biblioteca personal de anime" textFill="#9CA3AF">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+
+                <Label text="Organiza, puntúa y lleva el control de tus series favoritas en tiempo real con una interfaz moderna y fluida." textAlignment="CENTER" textFill="#E5E7EB" wrapText="true">
+                    <font>
+                        <Font size="15.0" />
+                    </font>
+                    <VBox.margin>
+                        <Insets left="10.0" right="10.0" />
+                    </VBox.margin>
+                </Label>
+
+                <Button fx:id="btnComenzar" mnemonicParsing="false" onAction="#onComenzarClick" prefHeight="48.0" prefWidth="240.0" style="-fx-background-color: #3B82F6; -fx-background-radius: 25; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(59, 130, 246, 0.4), 15, 0, 0, 0);" text="Comenzar">
+                    <font>
+                        <Font size="16.0" />
+                    </font>
+                </Button>
+
+                <Label text="v1.0.0 — Powered by Spring Boot &amp; JavaFX" textFill="#4B5563">
+                    <font>
+                        <Font size="11.0" />
+                    </font>
+                </Label>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

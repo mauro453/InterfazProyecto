@@ -26,13 +26,31 @@ public class NuevoAnimeController {
 
     private Long usuarioId;
     private DashboardController dashboardController;
-    private File fotoSeleccionada; // Almacenará el archivo físico de la imagen
+    private File fotoSeleccionada;
+
+    // Almacenará el objeto si se abre en modo edición
+    private Anime animeEdicion;
 
     private final HttpClient client = HttpClient.newHttpClient();
 
     public void setData(Long usuarioId, DashboardController controller) {
         this.usuarioId = usuarioId;
         this.dashboardController = controller;
+    }
+
+    // Método para activar el "Modo Edición" rellenando los campos
+    public void setAnimeAEditar(Anime anime) {
+        this.animeEdicion = anime;
+
+        // Rellenamos el formulario con los datos que ya existen
+        txtTitulo.setText(anime.getTitulo());
+        txtPuntuacion.setText(String.valueOf(anime.getPuntuacion()));
+        txtDescripcion.setText(anime.getDescripcion() != null ? anime.getDescripcion() : "");
+        btnGuardar.setText("Actualizar Anime");
+
+        if (anime.getPortada() != null && !anime.getPortada().trim().isEmpty()) {
+            lblNombreArchivo.setText("Mantener portada actual");
+        }
     }
 
     @FXML
@@ -46,7 +64,6 @@ public class NuevoAnimeController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Seleccionar Portada del Anime");
 
-        // Filtramos para que solo deje elegir formatos de imagen comunes
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Imágenes", "*.jpg", "*.jpeg", "*.png")
         );
@@ -56,7 +73,7 @@ public class NuevoAnimeController {
 
         if (file != null) {
             this.fotoSeleccionada = file;
-            lblNombreArchivo.setText(file.getName()); // Mostramos el nombre en la interfaz
+            lblNombreArchivo.setText(file.getName());
         }
     }
 
@@ -83,16 +100,26 @@ public class NuevoAnimeController {
             // Creamos el cuerpo binario de la petición HTTP
             byte[] body = buildMultipartBody(boundary, titulo, puntuacion, descripcion);
 
+            String urlString = "http://localhost:8080/api/animes/upload";
+            String metodo = "POST";
+
+            if (animeEdicion != null) {
+                // CORREGIDO: Ajustado exactamente a la ruta @PutMapping("/{id}") de tu Spring Boot
+                urlString = "http://localhost:8080/api/animes/" + animeEdicion.getId();
+                metodo = "PUT";
+            }
+
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("http://localhost:8080/api/animes/upload"))
+                    .uri(URI.create(urlString))
                     .header("Content-Type", "multipart/form-data; boundary=" + boundary)
-                    .POST(HttpRequest.BodyPublishers.ofByteArray(body))
+                    .method(metodo, HttpRequest.BodyPublishers.ofByteArray(body))
                     .build();
 
             client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                     .thenAccept(response -> {
                         Platform.runLater(() -> {
-                            if (response.statusCode() == 200) {
+                            // Tu backend devuelve 200 OK con el objeto mapeado al actualizar o guardar
+                            if (response.statusCode() == 200 || response.statusCode() == 204) {
                                 dashboardController.setUsuarioId(usuarioId); // Refresca catálogo
                                 Stage stage = (Stage) btnGuardar.getScene().getWindow();
                                 stage.close();
@@ -110,7 +137,6 @@ public class NuevoAnimeController {
         }
     }
 
-    // Método auxiliar para estructurar los datos igual que un formulario web con archivos adjuntos
     private byte[] buildMultipartBody(String boundary, String titulo, int puntuacion, String descripcion) throws IOException {
         List<byte[]> byteArrays = new ArrayList<>();
         String separator = "--" + boundary + "\r\n";
@@ -121,7 +147,7 @@ public class NuevoAnimeController {
         byteArrays.add((separator + "Content-Disposition: form-data; name=\"puntuacion\"\r\n\r\n" + puntuacion + "\r\n").getBytes());
         // Campo: descripcion
         byteArrays.add((separator + "Content-Disposition: form-data; name=\"descripcion\"\r\n\r\n" + descripcion + "\r\n").getBytes());
-        // Campo: usuarioId
+        // Campo: usuarioId (Spring Boot lo ignorará de forma segura en el PUT, genial para reutilizar el método)
         byteArrays.add((separator + "Content-Disposition: form-data; name=\"usuarioId\"\r\n\r\n" + usuarioId + "\r\n").getBytes());
 
         // Campo: file (Archivo de imagen adjunto)
@@ -130,14 +156,13 @@ public class NuevoAnimeController {
                     "Content-Disposition: form-data; name=\"file\"; filename=\"" + fotoSeleccionada.getName() + "\"\r\n" +
                     "Content-Type: " + Files.probeContentType(fotoSeleccionada.toPath()) + "\r\n\r\n";
             byteArrays.add(fileHeader.getBytes());
-            byteArrays.add(Files.readAllBytes(fotoSeleccionada.toPath())); // Leemos los bytes reales de la foto
+            byteArrays.add(Files.readAllBytes(fotoSeleccionada.toPath()));
             byteArrays.add("\r\n".getBytes());
         }
 
         // Fin del cuerpo
         byteArrays.add(("--" + boundary + "--\r\n").getBytes());
 
-        // Juntamos todos los trozos en un único array de bytes
         int totalLength = byteArrays.stream().mapToInt(arr -> arr.length).sum();
         byte[] result = new byte[totalLength];
         int currentIndex = 0;
